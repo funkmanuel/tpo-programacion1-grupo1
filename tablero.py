@@ -3,10 +3,11 @@
 # El jugador usa valores de 1 a N, pero la lista empieza en 0 (por eso el -1)
 # Este modulo no usa print ni input
 
+import re
 
+#Configuracion: Patron para validar un punto "3, 5, 4"
 
-# Configuracion
-
+PATRON_PUNTO = r"^(\d{1,2}),(\d{1,2}),(\d{1,2})$"
 N_POR_DEFECTO = 8
 N_MINIMO = 5   # el portaaviones mide 5
 N_MAXIMO = 15
@@ -36,12 +37,12 @@ SIMBOLOS = {
 # Creacion del cubo
 
 def tamanio_valido(n):
-    # Verifica si el tamaño del cubo está dentro de los límites permitidos
+    """ Verifica si el tamaño del cubo está dentro de los límites permitidos """
     return n >= N_MINIMO and n <= N_MAXIMO
 
 
 def crear_cubo(n):
-    # Crea el cubo 3D del tamaño indicado, inicialmente lleno de agua
+    """ Crea el cubo 3D del tamaño indicado, inicialmente lleno de agua """
     if not tamanio_valido(n):
         return None
     cubo = []
@@ -57,14 +58,14 @@ def crear_cubo(n):
 
 
 def tamanio(cubo):
-    # Devuelve el tamaño (N) del cubo
+    """ Devuelve el tamaño (N) del cubo """
     return len(cubo)
 
 
 # Validacion de puntos
 
 def punto_valido(punto, n):
-    # Verifica si una coordenada (z, x, y) existe dentro de los límites del cubo
+    """ Verifica si una coordenada (z, x, y) existe dentro de los límites del cubo """
     if len(punto) != 3:
         return False
     for valor in punto:
@@ -72,21 +73,21 @@ def punto_valido(punto, n):
             return False
     return True
 
-
 def texto_a_punto(texto, n):
-    #Convierte un texto con formato '3,5,4' a una tupla de tres números enteros
+    """Convierte un texto con formato '3,5,4' a una tupla de tres números enteros"""
     texto = texto.strip()
-    partes = texto.split(",")
-    if len(partes) != 3:
+    coincidencia = re.match(PATRON_PUNTO, texto)
+    if coincidencia is None:
         return None
-    
-    punto = (int(partes[0]), int(partes[1]), int(partes[2]))
+    z, x, y = coincidencia.groups()
+    punto = (int(z), int(x), int(y))
     if not punto_valido(punto, n):
         return None
     return punto
 
+
 def texto_a_tramo(texto, n):
-    # Separa el texto por el guion para obtener dos puntos (desde y hasta)
+    """ Separa el texto por el guion para obtener dos puntos (desde y hasta) """
     partes = texto.split("-")
     if len(partes) != 2:
         return None
@@ -98,7 +99,7 @@ def texto_a_tramo(texto, n):
 
 
 def punto_a_texto(punto):
-    # Convierte una tupla de coordenadas a un texto separado por comas
+    """ Convierte una tupla de coordenadas a un texto separado por comas """
     z, x, y = punto
     return f"{z},{x},{y}"
 
@@ -106,7 +107,7 @@ def punto_a_texto(punto):
 # Leer y escribir celdas
 
 def leer_celda(cubo, punto):
-    # Devuelve el estado actual de una celda específica del cubo
+    """ Devuelve el estado actual de una celda específica del cubo """
     if not punto_valido(punto, tamanio(cubo)):
         return None
     z, x, y = punto
@@ -114,7 +115,7 @@ def leer_celda(cubo, punto):
 
 
 def escribir_celda(cubo, punto, estado):
-    # Modifica el estado de una celda si el punto y el estado son válidos
+    """ Modifica el estado de una celda si el punto y el estado son válidos """
     if estado not in SIMBOLOS:
         return False
     if not punto_valido(punto, tamanio(cubo)):
@@ -127,7 +128,7 @@ def escribir_celda(cubo, punto, estado):
 # Operaciones de matrices
 
 def obtener_capa_z(cubo, z):
-    # Genera una copia exacta de la matriz correspondiente a la capa z
+    """ Genera una copia exacta de la matriz correspondiente a la capa z """
     if z < 1 or z > tamanio(cubo):
         return None
     capa = cubo[z - 1]
@@ -138,7 +139,7 @@ def obtener_capa_z(cubo, z):
 
 
 def transponer(matriz):
-    # Transpone una matriz (las filas pasan a columnas)
+    """ Transpone una matriz (las filas pasan a columnas) """
     filas = len(matriz)
     columnas = len(matriz[0])
     resultado = []
@@ -151,7 +152,7 @@ def transponer(matriz):
 
 
 def contar_estado(cubo, estado):
-    # Cuenta la cantidad total de celdas en el cubo que tienen un estado específico
+    """ Cuenta la cantidad total de celdas en el cubo que tienen un estado específico """
     cantidad = 0
     n = tamanio(cubo)
     for z in range(0, n):
@@ -161,7 +162,7 @@ def contar_estado(cubo, estado):
 
 
 def puntos_con_estado(cubo, estado):
-    # Busca y devuelve un conjunto con todas las coordenadas que tienen un estado particular
+    """ Busca y devuelve un conjunto con todas las coordenadas que tienen un estado particular """
     puntos = set()
     n = tamanio(cubo)
     for z in range(0, n):
@@ -175,14 +176,14 @@ def puntos_con_estado(cubo, estado):
 # Dibujo
 
 def completar_espacios(texto, ancho):
-    # Rellena el texto con espacios al final hasta alcanzar el ancho deseado
+    """ Rellena el texto con espacios al final hasta alcanzar el ancho deseado """
     if len(texto) >= ancho:
         return texto
     return texto + " " * (ancho - len(texto))
 
 
 def dibujar_capa_z(cubo, z, es_rival):
-    # Genera el texto con el formato para imprimir una capa entera por pantalla
+    """ Genera el texto con el formato para imprimir una capa entera por pantalla """
     capa = obtener_capa_z(cubo, z)
     if capa is None:
         return None
@@ -212,6 +213,6 @@ def dibujar_capa_z(cubo, z, es_rival):
 
 
 def referencias():
-    # Devuelve el texto con la explicación de los símbolos usados en el tablero
+    """ Devuelve el texto con la explicación de los símbolos usados en el tablero """
     texto = "Referencias: ~ sin explorar o agua   o agua marcada   X impacto   # hundido   ? detectado   N nave"
     return texto
