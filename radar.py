@@ -5,6 +5,11 @@ from tablero import leer_celda, NAVE
 
 
 def buscar_nave_lineal(cubo, estado_buscado=NAVE):
+    """Recibe un cubo y el estado a buscar (NAVE por defecto).
+
+    Devuelve una lista de puntos (z, x, y) y un diccionario de métricas
+    con comparaciones, tiempo_ms y profundidad_max. No modifica el cubo.
+    """
     n = len(cubo)
     inicio = time.perf_counter()
     encontrados = []
