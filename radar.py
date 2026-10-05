@@ -1,8 +1,10 @@
 
 import time
 
+from tablero import leer_celda, NAVE
 
-def buscar_nave_lineal(cubo, estado_buscado=ESTADO_NAVE_OCULTA):
+
+def buscar_nave_lineal(cubo, estado_buscado=NAVE):
     n = len(cubo)
     inicio = time.perf_counter()
     encontrados = []
@@ -11,7 +13,7 @@ def buscar_nave_lineal(cubo, estado_buscado=ESTADO_NAVE_OCULTA):
         for x in range(1, n + 1):
             for y in range(1, n + 1):
                 comparaciones = comparaciones + 1
-                if obtener_celda(cubo, (z, x, y)) == estado_buscado:
+                if leer_celda(cubo, (z, x, y)) == estado_buscado:
                     encontrados.append((z, x, y))
     fin = time.perf_counter()
     metricas = {
