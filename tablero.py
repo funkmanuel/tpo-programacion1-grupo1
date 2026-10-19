@@ -138,6 +138,34 @@ def obtener_capa_z(cubo, z):
     return copia
 
 
+def obtener_plano_x(cubo, x):
+    """ Genera la matriz del corte del cubo fijando x (filas z, columnas y) """
+    n = tamanio(cubo)
+    if x < 1 or x > n:
+        return None
+    plano = []
+    for z in range(0, n):
+        fila = []
+        for y in range(0, n):
+            fila.append(cubo[z][x - 1][y])
+        plano.append(fila)
+    return plano
+
+
+def obtener_plano_y(cubo, y):
+    """ Genera la matriz del corte del cubo fijando y (filas z, columnas x) """
+    n = tamanio(cubo)
+    if y < 1 or y > n:
+        return None
+    plano = []
+    for z in range(0, n):
+        fila = []
+        for x in range(0, n):
+            fila.append(cubo[z][x][y - 1])
+        plano.append(fila)
+    return plano
+
+
 def transponer(matriz):
     """ Transpone una matriz (las filas pasan a columnas) """
     filas = len(matriz)
@@ -171,6 +199,43 @@ def puntos_con_estado(cubo, estado):
                 if cubo[z][x][y] == estado:
                     puntos.add((z + 1, x + 1, y + 1))
     return puntos
+
+
+# Vecinos de una celda
+
+DIRECCIONES_ORTOGONALES = [
+    (-1, 0, 0), (1, 0, 0),
+    (0, -1, 0), (0, 1, 0),
+    (0, 0, -1), (0, 0, 1),
+]
+
+
+def vecinos_ortogonales(punto, n):
+    """ Devuelve las celdas que comparten una cara con el punto, dentro del cubo """
+    vecinos = []
+    if not punto_valido(punto, n):
+        return vecinos
+    z, x, y = punto
+    for dz, dx, dy in DIRECCIONES_ORTOGONALES:
+        vecino = (z + dz, x + dx, y + dy)
+        if punto_valido(vecino, n):
+            vecinos.append(vecino)
+    return vecinos
+
+
+def vecinos_todos(punto, n):
+    """ Devuelve todas las celdas que rodean al punto, incluidas las diagonales, dentro del cubo """
+    vecinos = []
+    if not punto_valido(punto, n):
+        return vecinos
+    z, x, y = punto
+    for dz in range(-1, 2):
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                vecino = (z + dz, x + dx, y + dy)
+                if vecino != punto and punto_valido(vecino, n):
+                    vecinos.append(vecino)
+    return vecinos
 
 
 # Dibujo
@@ -210,6 +275,47 @@ def dibujar_capa_z(cubo, z, es_rival):
         lineas.append(linea)
 
     return "\n".join(lineas)
+
+
+def dibujar_plano(plano, titulo, eje_columnas, es_rival):
+    """ Genera el texto con el formato para imprimir un plano con z en las filas """
+    n = len(plano)
+    ancho = len(eje_columnas + str(n))
+
+    lineas = []
+    lineas.append(f"========= {titulo} =========")
+
+    encabezado = completar_espacios("", ancho)
+    for columna in range(1, n + 1):
+        encabezado = encabezado + " " + completar_espacios(eje_columnas + str(columna), ancho)
+    lineas.append(encabezado)
+
+    for z in range(0, n):
+        linea = completar_espacios("z" + str(z + 1), ancho)
+        for columna in range(0, n):
+            estado = plano[z][columna]
+            if es_rival and estado == NAVE:
+                estado = AGUA
+            linea = linea + " " + completar_espacios(SIMBOLOS[estado], ancho)
+        lineas.append(linea)
+
+    return "\n".join(lineas)
+
+
+def dibujar_plano_x(cubo, x, es_rival):
+    """ Genera el texto para imprimir el corte del cubo fijando x """
+    plano = obtener_plano_x(cubo, x)
+    if plano is None:
+        return None
+    return dibujar_plano(plano, f"PLANO x = {x}", "y", es_rival)
+
+
+def dibujar_plano_y(cubo, y, es_rival):
+    """ Genera el texto para imprimir el corte del cubo fijando y """
+    plano = obtener_plano_y(cubo, y)
+    if plano is None:
+        return None
+    return dibujar_plano(plano, f"PLANO y = {y}", "x", es_rival)
 
 
 def referencias():
