@@ -1,4 +1,5 @@
-"""Busquedas de naves y sonar por planos para la entrega 2."""
+"""Busquedas y sonar (entrega 2)."""
+
 
 import time
 
@@ -6,12 +7,7 @@ from tablero import leer_celda, escribir_celda, NAVE, IMPACTO, HUNDIDO, DETECTAD
 
 
 def buscar_nave_lineal(cubo, estado_buscado=NAVE):
-    """Recibe un cubo y el estado a buscar (NAVE por defecto).
-
-    Devuelve una lista de puntos (z, x, y) y un diccionario de metricas
-    con comparaciones, tiempo_ms y profundidad_max. No modifica el cubo.
-    La profundidad es 0 porque la busqueda no es recursiva.
-    """
+    """recorre todo el cubo"""
     n = len(cubo)
     inicio = time.perf_counter()
     encontrados = []
@@ -32,16 +28,7 @@ def buscar_nave_lineal(cubo, estado_buscado=NAVE):
 
 
 def buscar_nave_optimizada(cubo, flota, estado_buscado=NAVE):
-    """Recibe el cubo y su flota completa, con las celdas de cada nave.
-
-    Devuelve los puntos encontrados y las mismas metricas que la busqueda lineal.
-    No modifica los datos. La flota debe corresponder al cubo recibido.
-
-    Revisa solo las celdas de las naves: con la flota completa son 35,
-    mientras que un cubo de 8 tiene 512 celdas. Usa el estado actual del cubo
-    para distinguir naves ocultas, detectadas, impactos y hundimientos.
-    Para buscar agua u otros estados utiliza la busqueda lineal.
-    """
+    """recorre celdas de la flota"""
     if estado_buscado not in (NAVE, IMPACTO, HUNDIDO, DETECTADO):
         return buscar_nave_lineal(cubo, estado_buscado)
 
@@ -67,7 +54,7 @@ def buscar_nave_optimizada(cubo, flota, estado_buscado=NAVE):
 
 
 def puntos_plano_z(n, valor):
-    """Recibe N y un valor de z validos; devuelve los puntos de ese plano."""
+    """puntos del plano z"""
     puntos = []
 
     for x in range(1, n + 1):
@@ -78,7 +65,7 @@ def puntos_plano_z(n, valor):
 
 
 def puntos_plano_x(n, valor):
-    """Recibe N y un valor de x validos; devuelve los puntos de ese plano."""
+    """puntos del plano x"""
     puntos = []
 
     for z in range(1, n + 1):
@@ -89,7 +76,7 @@ def puntos_plano_x(n, valor):
 
 
 def puntos_plano_y(n, valor):
-    """Recibe N y un valor de y validos; devuelve los puntos de ese plano."""
+    """puntos del plano y"""
     puntos = []
 
     for z in range(1, n + 1):
@@ -107,15 +94,7 @@ PLANOS = {
 
 
 def sonar_plano(cubo, eje, valor):
-    """Recibe un cubo, un eje (z/x/y) y el valor entero del plano entre 1 y N.
-
-    Devuelve el mismo cubo y una lista de las celdas ocupadas de ese plano.
-    Marca las naves ocultas como DETECTADO, sin causar impactos. Las celdas
-    ya detectadas, impactadas o hundidas tambien son contactos y conservan
-    su estado. El agua y las celdas fuera del plano no se modifican.
-
-    Lanza ValueError si el eje o el valor del plano son invalidos.
-    """
+    """detecta naves en un plano"""
     if not isinstance(eje, str):
         raise ValueError("El eje debe ser z, x o y.")
 

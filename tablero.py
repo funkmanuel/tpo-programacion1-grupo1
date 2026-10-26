@@ -7,7 +7,7 @@ import re
 
 #Configuracion: Patron para validar un punto "3, 5, 4"
 
-PATRON_PUNTO = r"^(\d{1,2}),(\d{1,2}),(\d{1,2})$"
+PATRON_PUNTO = r"^([0-9]{1,2})\s*,\s*([0-9]{1,2})\s*,\s*([0-9]{1,2})$"
 N_POR_DEFECTO = 8
 N_MINIMO = 5   # el portaaviones mide 5
 N_MAXIMO = 15
@@ -38,7 +38,7 @@ SIMBOLOS = {
 
 def tamanio_valido(n):
     """ Verifica si el tamaño del cubo está dentro de los límites permitidos """
-    return n >= N_MINIMO and n <= N_MAXIMO
+    return type(n) == int and n >= N_MINIMO and n <= N_MAXIMO
 
 
 def crear_cubo(n):
@@ -66,15 +66,19 @@ def tamanio(cubo):
 
 def punto_valido(punto, n):
     """ Verifica si una coordenada (z, x, y) existe dentro de los límites del cubo """
+    if not isinstance(punto, (tuple, list)) or type(n) != int:
+        return False
     if len(punto) != 3:
         return False
     for valor in punto:
-        if valor < 1 or valor > n:
+        if type(valor) != int or valor < 1 or valor > n:
             return False
     return True
 
 def texto_a_punto(texto, n):
     """Convierte un texto con formato '3,5,4' a una tupla de tres números enteros"""
+    if not isinstance(texto, str):
+        return None
     texto = texto.strip()
     coincidencia = re.match(PATRON_PUNTO, texto)
     if coincidencia is None:
@@ -88,6 +92,8 @@ def texto_a_punto(texto, n):
 
 def texto_a_tramo(texto, n):
     """ Separa el texto por el guion para obtener dos puntos (desde y hasta) """
+    if not isinstance(texto, str):
+        return None
     partes = texto.split("-")
     if len(partes) != 2:
         return None
@@ -129,7 +135,7 @@ def escribir_celda(cubo, punto, estado):
 
 def obtener_capa_z(cubo, z):
     """ Genera una copia exacta de la matriz correspondiente a la capa z """
-    if z < 1 or z > tamanio(cubo):
+    if type(z) != int or z < 1 or z > tamanio(cubo):
         return None
     capa = cubo[z - 1]
     copia = []
@@ -141,7 +147,7 @@ def obtener_capa_z(cubo, z):
 def obtener_plano_x(cubo, x):
     """ Genera la matriz del corte del cubo fijando x (filas z, columnas y) """
     n = tamanio(cubo)
-    if x < 1 or x > n:
+    if type(x) != int or x < 1 or x > n:
         return None
     plano = []
     for z in range(0, n):
@@ -155,7 +161,7 @@ def obtener_plano_x(cubo, x):
 def obtener_plano_y(cubo, y):
     """ Genera la matriz del corte del cubo fijando y (filas z, columnas x) """
     n = tamanio(cubo)
-    if y < 1 or y > n:
+    if type(y) != int or y < 1 or y > n:
         return None
     plano = []
     for z in range(0, n):

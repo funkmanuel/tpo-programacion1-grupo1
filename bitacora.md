@@ -4,3 +4,11 @@ flota.py : Realizado por Valentin Fernandez,
 radar.py : Realizado por Matias Konecny,
 partida.py : Realizado por Santiago Cordero,
 tablero.py: Realizado por Valentin Valenzuela
+
+**ENTREGA 2**
+partida.py : Realizado por Santiago Cordero,
+radar.py : Realizado por Manuel Funk,
+tablero.py : Realizado por Matias Konecny,
+armamento.py : Realizado por Valentin Valenzuela,
+flota.py : Realizado por Valentin Fernandez,
+registro.py : Realizado por Manuel Funk
