@@ -321,3 +321,46 @@ def obtener_resumen_flota(flota):
         elif datos["estado"] == "hundida":
             resumen["hundidas"] += 1
     return resumen
+
+
+def preparar_flota_para_guardar(flota):
+    """convierte a JSON"""
+    flota_guardar = {}
+    for id_nave, datos in flota.items():
+        datos_copia = datos.copy()
+        datos_copia["celdas"] = [list(c) for c in datos.get("celdas", [])]
+        if "impactos_por_celda" in datos:
+            impactos_json = {}
+            for celda, cnt in datos["impactos_por_celda"].items():
+                if isinstance(celda, (tuple, list)):
+                    z, x, y = celda
+                    impactos_json[f"{z},{x},{y}"] = cnt
+                else:
+                    impactos_json[str(celda)] = cnt
+            datos_copia["impactos_por_celda"] = impactos_json
+
+        flota_guardar[id_nave] = datos_copia
+
+    return flota_guardar
+
+def cargar_flota_desde_dict(datos_flota):
+    """carga desde diccionario"""
+    flota_cargada = {}
+    for id_nave, datos in datos_flota.items():
+        datos_copia = datos.copy()
+        datos_copia["celdas"] = [tuple(c) for c in datos.get("celdas", [])]
+        if "impactos_por_celda" in datos:
+            impactos_tupla = {}
+            for k, cnt in datos["impactos_por_celda"].items():
+                if isinstance(k, str) and "," in k:
+                    z, x, y = map(int, k.split(","))
+                    impactos_tupla[(z, x, y)] = cnt
+                elif isinstance(k, (tuple, list)):
+                    impactos_tupla[tuple(k)] = cnt
+                else:
+                    impactos_tupla[k] = cnt
+            datos_copia["impactos_por_celda"] = impactos_tupla
+
+        flota_cargada[id_nave] = datos_copia
+
+    return flota_cargada
