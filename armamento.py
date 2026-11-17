@@ -1,4 +1,4 @@
-"""Armas y disparos de la entrega 2."""
+"""Armas y disparos de la entrega 3."""
 
 
 import tablero
@@ -184,11 +184,66 @@ def barrido_laser(cubo, punto, eje="x", flota_defensor=None):
     return aplicar_puntos(cubo, puntos, flota_defensor, "L")
 
 
+RADIO_ONDA = 2
+
+
+def puntos_onda(n, punto, radio, alcanzados):
+    """propaga la onda recursivamente"""
+    alcanzados.add(punto)
+    if radio == 0:
+        return alcanzados
+    for vecino in tablero.vecinos_ortogonales(punto, n):
+        puntos_onda(n, vecino, radio - 1, alcanzados)
+    return alcanzados
+
+
+def onda_expansiva(cubo, punto, eje=None, flota_defensor=None):
+    """punto + onda con radio decreciente"""
+    punto = validar_punto(cubo, punto)
+    alcanzados = puntos_onda(tablero.tamanio(cubo), punto, RADIO_ONDA, set())
+    puntos = sorted(alcanzados)
+    return aplicar_puntos(cubo, puntos, flota_defensor, "O")
+
+
+def buscar_celda_guiada(cubo, punto, visitados):
+    """celda de nave contigua al impacto o None"""
+    visitados.add(punto)
+    for vecino in tablero.vecinos_ortogonales(punto, tablero.tamanio(cubo)):
+        if vecino not in visitados:
+            estado = tablero.leer_celda(cubo, vecino)
+            if estado in (tablero.NAVE, tablero.DETECTADO):
+                return vecino
+            if estado == tablero.IMPACTO:
+                encontrada = buscar_celda_guiada(cubo, vecino, visitados)
+                if encontrada is not None:
+                    return encontrada
+    return None
+
+
+def torpedo_guiado(cubo, punto, eje=None, flota_defensor=None):
+    """sigue un impacto previo"""
+    punto = validar_punto(cubo, punto)
+    impactos = []
+    if tablero.leer_celda(cubo, punto) == tablero.IMPACTO:
+        impactos.append(punto)
+    for impacto in sorted(tablero.puntos_con_estado(cubo, tablero.IMPACTO)):
+        if impacto != punto:
+            impactos.append(impacto)
+
+    for impacto in impactos:
+        objetivo = buscar_celda_guiada(cubo, impacto, set())
+        if objetivo is not None:
+            return aplicar_puntos(cubo, [objetivo], flota_defensor, "G")
+    return aplicar_puntos(cubo, [punto], flota_defensor, "G")
+
+
 ARMAS_DISPONIBLES = {
     "T": torpedo,
     "R": misil_racimo,
     "C": carga_profundidad,
     "L": barrido_laser,
+    "O": onda_expansiva,
+    "G": torpedo_guiado,
 }
 
 
