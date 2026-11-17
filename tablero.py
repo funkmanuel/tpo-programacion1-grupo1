@@ -328,3 +328,69 @@ def referencias():
     """ Devuelve el texto con la explicación de los símbolos usados en el tablero """
     texto = "Referencias: ~ sin explorar o agua   o agua marcada   X impacto   # hundido   ? detectado   N nave"
     return texto
+
+
+# Entrega 3: recorridos alternativos del cubo
+
+def recorrido_serpiente(cubo):
+    """Recorre las filas del cubo alternando el sentido."""
+    puntos = []
+    n = tamanio(cubo)
+
+    for z in range(1, n + 1):
+        for x in range(1, n + 1):
+            if (z + x) % 2 == 0:
+                for y in range(1, n + 1):
+                    puntos.append((z, x, y))
+            else:
+                for y in range(n, 0, -1):
+                    puntos.append((z, x, y))
+
+    return puntos
+
+
+def recorrido_espiral(cubo):
+    """Recorre cada capa del cubo en forma de espiral."""
+    puntos = []
+    n = tamanio(cubo)
+
+    for z in range(1, n + 1):
+        arriba = 1
+        abajo = n
+        izquierda = 1
+        derecha = n
+
+        while arriba <= abajo and izquierda <= derecha:
+            for y in range(izquierda, derecha + 1):
+                puntos.append((z, arriba, y))
+            arriba = arriba + 1
+
+            for x in range(arriba, abajo + 1):
+                puntos.append((z, x, derecha))
+            derecha = derecha - 1
+
+            if arriba <= abajo:
+                for y in range(derecha, izquierda - 1, -1):
+                    puntos.append((z, abajo, y))
+                abajo = abajo - 1
+
+            if izquierda <= derecha:
+                for x in range(abajo, arriba - 1, -1):
+                    puntos.append((z, x, izquierda))
+                izquierda = izquierda + 1
+
+    return puntos
+
+
+RECORRIDOS_TABLERO = {
+    "serpiente": recorrido_serpiente,
+    "espiral": recorrido_espiral,
+}
+
+
+def recorrer_tablero(cubo, recorrido="serpiente"):
+    """Devuelve los puntos segun el recorrido elegido."""
+    if recorrido not in RECORRIDOS_TABLERO:
+        raise ValueError("Recorrido no valido.")
+
+    return RECORRIDOS_TABLERO[recorrido](cubo)
