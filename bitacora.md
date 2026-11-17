@@ -12,3 +12,11 @@ tablero.py : Realizado por Matias Konecny,
 armamento.py : Realizado por Valentin Valenzuela,
 flota.py : Realizado por Valentin Fernandez,
 registro.py : Realizado por Manuel Funk
+
+**ENTREGA 3**
+partida.py : Realizado por Valentin Valenzuela,
+radar.py : Realizado por Valentin Valenzuela,
+tablero.py : Realizado por Valentin Valenzuela,
+armamento.py : Realizado por Matias Konecny,
+flota.py : Realizado por Valentin Fernandez,
+registro.py : Realizado por Manuel Funk
