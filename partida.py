@@ -214,8 +214,13 @@ def nueva_partida_vs_maquina(configuracion, dificultad="basica"):
     return estado
 
 
-def nueva_partida_maquina_vs_maquina(configuracion, dificultad_1="basica", dificultad_2="avanzada"):
-    """Recibe configuracion y dificultades. Devuelve el estado. Puede lanzar ErrorJuego."""
+def nueva_partida_maquina_vs_maquina(configuracion, dificultades=("basica", "avanzada")):
+    """Recibe la configuracion y las dificultades de ambas maquinas.
+    Devuelve el estado inicial. Puede lanzar ErrorJuego.
+    """
+    if not isinstance(dificultades, (list, tuple)) or len(dificultades) != 2:
+        raise ErrorJuego("Las dificultades deben ser dos valores.")
+    dificultad_1, dificultad_2 = dificultades
     if dificultad_1 not in ("basica", "avanzada") or dificultad_2 not in ("basica", "avanzada"):
         raise ErrorJuego("Dificultad invalida.")
     estado = nueva_partida_1v1(configuracion)
@@ -733,7 +738,7 @@ def partida_maquina_contra_maquina():
     n = pedir_tamanio()
     dificultad_1 = pedir_dificultad("Maquina 1")
     dificultad_2 = pedir_dificultad("Maquina 2")
-    estado = nueva_partida_maquina_vs_maquina({"tamanio": n}, dificultad_1, dificultad_2)
+    estado = nueva_partida_maquina_vs_maquina({"tamanio": n}, (dificultad_1, dificultad_2))
     return jugar_partida(estado)
 
 
