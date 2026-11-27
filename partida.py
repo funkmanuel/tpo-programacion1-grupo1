@@ -648,16 +648,11 @@ def menu_simulacion(estado):
     print("4 - Guardar y salir")
     print("5 - Terminar sin guardar")
     opcion = pedir_opcion("Opcion: ", ["1", "2", "3", "4", "5"])
-    if opcion == "1":
-        return 1
-    if opcion == "2":
-        return 10
-    if opcion == "3":
-        return -1
-    if opcion == "4":
-        accion_guardar_salir(estado)
-    else:
-        accion_cancelar(estado)
+    turnos = {"1": 1, "2": 10, "3": -1}
+    acciones = {"4": accion_guardar_salir, "5": accion_cancelar}
+    if opcion in turnos:
+        return turnos[opcion]
+    acciones[opcion](estado)
     return 0
 
 
